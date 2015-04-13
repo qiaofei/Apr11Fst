@@ -39,10 +39,10 @@ public class backgroundView extends View {
 	private int enemiesOrder = 0;
 	private int bulletDensity = 0;
 	private int enemiesDesity = 0;
-	private int planeScores = 0;	
+	private int planeScores = 0;
 	private Bullets bullet[] = new Bullets[bulletCount];
 	private Bitmap bulletBitmap[] = new Bitmap[bulletCount];
-	//draw enemies
+	// draw enemies
 	private EnemyPlane enemyPlanes[] = new EnemyPlane[enemyCount];
 	private Bitmap enemyBitmap[] = new Bitmap[enemyCount];
 	// the beginning place of background
@@ -50,19 +50,19 @@ public class backgroundView extends View {
 
 	public backgroundView(Context context) {
 		super(context);
-		//plane bitmap
+		// plane bitmap
 		planeBitmap = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.plane);
 		// background bitmaps
 		backGroundBitmap = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.background);
-		//bullets bitmap
+		// bullets bitmap
 		for (int i = 0; i < bulletCount; i++) {
 			bulletBitmap[i] = BitmapFactory.decodeResource(
 					context.getResources(), R.drawable.bullet);
 			bullet[i] = new Bullets(bulletX, bulletY);
 		}
-		//enemies bitmap
+		// enemies bitmap
 		for (int i = 0; i < enemyCount; i++) {
 			enemyBitmap[i] = BitmapFactory.decodeResource(
 					context.getResources(), R.drawable.enemy);
@@ -79,29 +79,32 @@ public class backgroundView extends View {
 					} else {
 						startY -= planeSpeed;
 					}
-					//if bullets is out of screen 
+					// if bullets is out of screen
 					for (int i = 0; i < bulletCount; i++) {
 						if (bullet[i].isExist()
 								&& bullet[i].getPositionY() <= 0) {
 							bullet[i].setExist(false);
 						}
 					}
-					//is enemy is dead
-					for(int i = 0 ; i < enemyCount ; i++){
-						if(enemyPlanes[i].isAlive()&&enemyPlanes[i].getPositionY() >= 1200){
+					// is enemy is dead
+					for (int i = 0; i < enemyCount; i++) {
+						if (enemyPlanes[i].isAlive()
+								&& enemyPlanes[i].getPositionY() >= 1200) {
 							enemyPlanes[i].enemyDead();
 						}
 					}
-					for(int i = 0 ; i < bulletCount ; i++){
-						for(int j = 0 ; j < enemyCount ; j++){
-							if(
-									bullet[i].getPositionX()-enemyPlanes[j].getPositionX() <= 60 &&
-									bullet[i].getPositionX()-enemyPlanes[j].getPositionX() >=-5 &&
-									bullet[i].getPositionY()-enemyPlanes[j].getPositionY() <=60&&
-									bullet[i].getPositionY()-enemyPlanes[j].getPositionY() >= -5		
-									){
+					for (int i = 0; i < bulletCount; i++) {
+						for (int j = 0; j < enemyCount; j++) {
+							if (bullet[i].getPositionX()
+									- enemyPlanes[j].getPositionX() <= 85
+									&& bullet[i].getPositionX()
+											- enemyPlanes[j].getPositionX() >= -5
+									&& bullet[i].getPositionY()
+											- enemyPlanes[j].getPositionY() <= 85
+									&& bullet[i].getPositionY()
+											- enemyPlanes[j].getPositionY() >= -5) {
 								enemyPlanes[j].enemyDead();
-								planeScores ++ ;
+								planeScores++;
 							}
 						}
 					}
@@ -161,27 +164,27 @@ public class backgroundView extends View {
 		paint.setTextSize(40);
 		bulletX = prefx + 30;
 		bulletY = prefy - 10;
-		//string scores = (string)
+		// string scores = (string)
 		super.onDraw(canvas);
 		Bitmap bitmapCurrent = Bitmap.createBitmap(backGroundBitmap, 0, startY,
 				WIDTH, HEIGHT);
 		// draw background & plane
 		canvas.drawBitmap(bitmapCurrent, 0, 0, null);
 		canvas.drawBitmap(planeBitmap, prefx, prefy, null);
-		canvas.drawText("scores:"+ planeScores, 500, 80, paint);
+		canvas.drawText("scores:" + planeScores, 500, 80, paint);
 		// draw bullets
 		if (bulletOrder >= bulletCount - 1) {
 			bulletOrder = 0;
 		}
 		bulletOrder++;
-		if(bulletDensity == 5 ){
-			bulletDensity = 0 ;
+		if (bulletDensity == 5) {
+			bulletDensity = 0;
 		}
 		bulletDensity++;
-		if(bulletDensity == 5 ){
+		if (bulletDensity == 5) {
 			bullet[bulletOrder].setExist(true);
 		}
-		//bullet[bulletOrder].setExist(true);
+		// bullet[bulletOrder].setExist(true);
 		bullet[bulletOrder].setPositionX(bulletX);
 		bullet[bulletOrder].setPositionY(bulletY);
 		for (int i = 0; i < bulletCount; i++) {
@@ -191,23 +194,24 @@ public class backgroundView extends View {
 						bullet[i].getPositionY(), null);
 			}
 		}
-		//draw enemies
-		if(enemiesOrder >=enemyCount - 1){
+		// draw enemies
+		if (enemiesOrder >= enemyCount - 1) {
 			enemiesOrder = 0;
-		}		
+		}
 		enemiesOrder++;
-		if(enemiesDesity == 10 ){
-			enemiesDesity = 0 ;
+		if (enemiesDesity == 10) {
+			enemiesDesity = 0;
 		}
 		enemiesDesity++;
-		if(enemiesDesity == 10 ){
+		if (enemiesDesity == 10) {
 			enemyPlanes[enemiesOrder].setAlive(true);
 		}
-		for (int i = 0 ; i < enemyCount ; i++){
-			if(enemyPlanes[i].isAlive()){
+		for (int i = 0; i < enemyCount; i++) {
+			if (enemyPlanes[i].isAlive()) {
 				enemyPlanes[i].strikeToPlane();
-				canvas.drawBitmap(enemyBitmap[i], enemyPlanes[i].getPositionX(), 
-						enemyPlanes[i].getPositionY(),null);
+				canvas.drawBitmap(enemyBitmap[i],
+						enemyPlanes[i].getPositionX(),
+						enemyPlanes[i].getPositionY(), null);
 			}
 		}
 	}
