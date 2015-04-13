@@ -14,6 +14,12 @@ public class EnemyPlane {
 		this.positionY = 0;
 		isAlive = false;
 	}
+	public float getEnemySpeed() {
+		return enemySpeed;
+	}
+	public void setEnemySpeed(float enemySpeed) {
+		this.enemySpeed = enemySpeed;
+	}
 	public void enemyDead(){
 		this.isAlive = false;
 		this.positionX = rand.nextFloat()*650;

@@ -37,8 +37,10 @@ public class backgroundView extends View {
 	private int enemyCount = 10;
 	private int bulletOrder = 0;
 	private int enemiesOrder = 0;
-	private int bulletDensity = 0;
-	private int enemiesDesity = 0;
+	private int bulletCounter = 0;
+	private int oneBulletTime = 5;
+	private int enemyCounter = 0;
+	private int oneEnemyTime = 10;
 	private int planeScores = 0;
 	private Bullets bullet[] = new Bullets[bulletCount];
 	private Bitmap bulletBitmap[] = new Bitmap[bulletCount];
@@ -47,6 +49,9 @@ public class backgroundView extends View {
 	private Bitmap enemyBitmap[] = new Bitmap[enemyCount];
 	// the beginning place of background
 	int startY = backLength - HEIGHT;
+	// if Game Over?
+	private boolean isGameOver = false;
+	private int passedEnemy = 0;
 
 	public backgroundView(Context context) {
 		super(context);
@@ -91,25 +96,55 @@ public class backgroundView extends View {
 						if (enemyPlanes[i].isAlive()
 								&& enemyPlanes[i].getPositionY() >= 1200) {
 							enemyPlanes[i].enemyDead();
-						}
-					}
-					for (int i = 0; i < bulletCount; i++) {
-						for (int j = 0; j < enemyCount; j++) {
-							if (bullet[i].getPositionX()
-									- enemyPlanes[j].getPositionX() <= 85
-									&& bullet[i].getPositionX()
-											- enemyPlanes[j].getPositionX() >= -5
-									&& bullet[i].getPositionY()
-											- enemyPlanes[j].getPositionY() <= 85
-									&& bullet[i].getPositionY()
-											- enemyPlanes[j].getPositionY() >= -5) {
-								enemyPlanes[j].enemyDead();
-								planeScores++;
+							passedEnemy++;
+							if (passedEnemy >= 10) {
+								isGameOver = true;
 							}
 						}
 					}
+					if (!isGameOver) {
+						for (int i = 0; i < bulletCount; i++) {
+							for (int j = 0; j < enemyCount; j++) {
+								if (bullet[i].getPositionX()
+										- enemyPlanes[j].getPositionX() <= 85
+										&& bullet[i].getPositionX()
+												- enemyPlanes[j].getPositionX() >= -5
+										&& bullet[i].getPositionY()
+												- enemyPlanes[j].getPositionY() <= 85
+										&& bullet[i].getPositionY()
+												- enemyPlanes[j].getPositionY() >= -5) {
+									enemyPlanes[j].enemyDead();
+									planeScores++;
+									if (planeScores % 50 == 0
+											&& planeScores > 0
+											&& oneEnemyTime > 1) {
+										oneEnemyTime--;
+										for (int k = 0; k < enemyCount; k++)
+
+										{
+											enemyPlanes[k]
+													.setEnemySpeed(enemyPlanes[k]
+															.getEnemySpeed() + 3);
+										}
+									}
+								}
+							}
+						}
+					}
+					// check game over
+					for (int i = 0; i < enemyCount; i++) {
+						if (enemyPlanes[i].isAlive()
+								&& enemyPlanes[i].getPositionX() - prefx >= -80
+								&& enemyPlanes[i].getPositionX() - prefx <= 80
+								&& enemyPlanes[i].getPositionY() - prefy >= -80
+								&& enemyPlanes[i].getPositionY() - prefy <= 80) {
+							isGameOver = true;
+						}
+					}
 				}
+				// if(!isGameOver){
 				invalidate();
+				// }
 			}
 		};
 		// timer
@@ -150,7 +185,9 @@ public class backgroundView extends View {
 				// prefx += speedY*moveSlope;
 				prefx += moveSpeed;
 			}
+			// if(!isGameOver){
 			invalidate();
+			// }
 			break;
 		}
 		return true;
@@ -170,42 +207,52 @@ public class backgroundView extends View {
 				WIDTH, HEIGHT);
 		// draw background & plane
 		canvas.drawBitmap(bitmapCurrent, 0, 0, null);
-		canvas.drawBitmap(planeBitmap, prefx, prefy, null);
+		if (!isGameOver) {
+			canvas.drawBitmap(planeBitmap, prefx, prefy, null);
+		} else {
+			canvas.drawText("GAME OVER", 230, 550, paint);
+		}
 		canvas.drawText("scores:" + planeScores, 500, 80, paint);
+		canvas.drawText("passed enemies:" + passedEnemy, 10, 80, paint);
 		// draw bullets
 		if (bulletOrder >= bulletCount - 1) {
 			bulletOrder = 0;
 		}
 		bulletOrder++;
-		if (bulletDensity == 5) {
-			bulletDensity = 0;
+		if (bulletCounter == oneBulletTime) {
+			bulletCounter = 0;
 		}
-		bulletDensity++;
-		if (bulletDensity == 5) {
+		bulletCounter++;
+		if (bulletCounter == oneBulletTime) {
 			bullet[bulletOrder].setExist(true);
 		}
 		// bullet[bulletOrder].setExist(true);
 		bullet[bulletOrder].setPositionX(bulletX);
 		bullet[bulletOrder].setPositionY(bulletY);
-		for (int i = 0; i < bulletCount; i++) {
-			if (bullet[i].isExist()) {
-				bullet[i].shootAndMove();
-				canvas.drawBitmap(bulletBitmap[i], bullet[i].getPositionX(),
-						bullet[i].getPositionY(), null);
+		if (!isGameOver) {
+			for (int i = 0; i < bulletCount; i++) {
+				if (bullet[i].isExist()) {
+					bullet[i].shootAndMove();
+					canvas.drawBitmap(bulletBitmap[i],
+							bullet[i].getPositionX(), bullet[i].getPositionY(),
+							null);
+				}
 			}
 		}
 		// draw enemies
-		if (enemiesOrder >= enemyCount - 1) {
-			enemiesOrder = 0;
-		}
-		enemiesOrder++;
-		if (enemiesDesity == 10) {
-			enemiesDesity = 0;
-		}
-		enemiesDesity++;
-		if (enemiesDesity == 10) {
+		// if it`s time to release an enemy
+		if (enemyCounter == oneEnemyTime) {
+			enemyCounter = 0;
+			if (enemiesOrder >= enemyCount - 1) {
+				enemiesOrder = 0;
+			}
+			enemiesOrder++;
 			enemyPlanes[enemiesOrder].setAlive(true);
 		}
+		enemyCounter++;
+		/*
+		 * if (enemyCounter == 10) { enemyPlanes[enemiesOrder].setAlive(true); }
+		 */
 		for (int i = 0; i < enemyCount; i++) {
 			if (enemyPlanes[i].isAlive()) {
 				enemyPlanes[i].strikeToPlane();
