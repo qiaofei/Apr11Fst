@@ -10,13 +10,13 @@ public class EnemyPlane {
 	Random rand = new Random();
 	public EnemyPlane() {
 		// TODO Auto-generated constructor stub		
-		this.positionX = rand.nextFloat()*700;
+		this.positionX = rand.nextFloat()*650;
 		this.positionY = 0;
 		isAlive = false;
 	}
 	public void enemyDead(){
 		this.isAlive = false;
-		this.positionX = rand.nextFloat()*700;
+		this.positionX = rand.nextFloat()*650;
 		this.positionY = 0;
 	}
 	public void strikeToPlane() {
