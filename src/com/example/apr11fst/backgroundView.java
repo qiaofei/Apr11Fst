@@ -19,7 +19,7 @@ public class backgroundView extends View {
 	private Bitmap planeBitmap;
 	private Bitmap backGroundBitmap;
 	// background length
-	final int backLength = 3240;
+	final int backLength = 3600;
 	// size of canvas
 	final int WIDTH = 800;
 	final int HEIGHT = 1200;
@@ -29,8 +29,8 @@ public class backgroundView extends View {
 	float prefy = 800;
 	float bulletX = prefx + 30;
 	float bulletY = prefy - 10;
-	final float moveSpeed = 25;
-	final float planeSpeed = 5;
+	final float moveSpeed = 40;
+	final float planeSpeed = 3;
 	final float bulletSpeed = 20;
 	// draw bullets
 	private int bulletCount = 40;
