@@ -3,6 +3,6 @@
 
     <string name="app_name">Apr11Fst</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="pauseGame">Pause..</string>
+    <string name="startGame">Start..</string>
 </resources>

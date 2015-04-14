@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
 import android.view.MotionEvent;
@@ -52,9 +53,23 @@ public class backgroundView extends View {
 	// if Game Over?
 	private boolean isGameOver = false;
 	private int passedEnemy = 0;
+	// music
+	public boolean isSoundon = true ;
+	public MediaPlayer bgmPlayer;
+	public MediaPlayer gameoverPlayer;
+	public MediaPlayer shootingPlayer;
+	public MediaPlayer enemyDeadPlayer;
 
 	public backgroundView(Context context) {
 		super(context);
+		// init sound
+		bgmPlayer = MediaPlayer.create(context, R.raw.backgroundmusic);
+		if(isSoundon){
+		bgmPlayer.start();
+		}
+		gameoverPlayer = MediaPlayer.create(context, R.raw.lost_life);
+		shootingPlayer = MediaPlayer.create(context, R.raw.shootting_sound);
+		enemyDeadPlayer = MediaPlayer.create(context,R.raw.enemydead);
 		// plane bitmap
 		planeBitmap = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.plane);
@@ -99,6 +114,10 @@ public class backgroundView extends View {
 							passedEnemy++;
 							if (passedEnemy >= 10) {
 								isGameOver = true;
+								bgmPlayer.stop();
+								if(isSoundon){
+								gameoverPlayer.start();
+								}
 							}
 						}
 					}
@@ -114,6 +133,9 @@ public class backgroundView extends View {
 										&& bullet[i].getPositionY()
 												- enemyPlanes[j].getPositionY() >= -5) {
 									enemyPlanes[j].enemyDead();
+									if(isSoundon){
+									shootingPlayer.start();
+									}
 									planeScores++;
 									if (planeScores % 50 == 0
 											&& planeScores > 0
@@ -139,6 +161,10 @@ public class backgroundView extends View {
 								&& enemyPlanes[i].getPositionY() - prefy >= -80
 								&& enemyPlanes[i].getPositionY() - prefy <= 80) {
 							isGameOver = true;
+							bgmPlayer.stop();
+							if(isSoundon){
+							gameoverPlayer.start();
+							}
 						}
 					}
 				}
@@ -214,6 +240,12 @@ public class backgroundView extends View {
 		}
 		canvas.drawText("scores:" + planeScores, 500, 80, paint);
 		canvas.drawText("passed enemies:" + passedEnemy, 10, 80, paint);
+		if(isSoundon){
+			canvas.drawText("sound on", 500, 120, paint);
+		}
+		else{
+			canvas.drawText("sound off", 500, 120, paint);
+		}
 		// draw bullets
 		if (bulletOrder >= bulletCount - 1) {
 			bulletOrder = 0;
@@ -224,7 +256,10 @@ public class backgroundView extends View {
 		}
 		bulletCounter++;
 		if (bulletCounter == oneBulletTime) {
-			bullet[bulletOrder].setExist(true);
+			if (!isGameOver) {
+				bullet[bulletOrder].setExist(true);
+				//shootingPlayer.start();
+			}
 		}
 		// bullet[bulletOrder].setExist(true);
 		bullet[bulletOrder].setPositionX(bulletX);
