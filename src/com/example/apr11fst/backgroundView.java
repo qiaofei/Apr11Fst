@@ -43,6 +43,7 @@ public class backgroundView extends View {
 	private int enemyCounter = 0;
 	private int oneEnemyTime = 10;
 	private int planeScores = 0;
+	public boolean isPause = false;
 	private Bullets bullet[] = new Bullets[bulletCount];
 	private Bitmap bulletBitmap[] = new Bitmap[bulletCount];
 	// draw enemies
@@ -54,7 +55,7 @@ public class backgroundView extends View {
 	private boolean isGameOver = false;
 	private int passedEnemy = 0;
 	// music
-	public boolean isSoundon = true ;
+	public boolean isSoundon = false;
 	public MediaPlayer bgmPlayer;
 	public MediaPlayer gameoverPlayer;
 	public MediaPlayer shootingPlayer;
@@ -64,12 +65,12 @@ public class backgroundView extends View {
 		super(context);
 		// init sound
 		bgmPlayer = MediaPlayer.create(context, R.raw.backgroundmusic);
-		if(isSoundon){
-		bgmPlayer.start();
+		if (isSoundon) {
+			bgmPlayer.start();
 		}
 		gameoverPlayer = MediaPlayer.create(context, R.raw.lost_life);
 		shootingPlayer = MediaPlayer.create(context, R.raw.shootting_sound);
-		enemyDeadPlayer = MediaPlayer.create(context,R.raw.enemydead);
+		enemyDeadPlayer = MediaPlayer.create(context, R.raw.enemydead);
 		// plane bitmap
 		planeBitmap = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.plane);
@@ -115,8 +116,8 @@ public class backgroundView extends View {
 							if (passedEnemy >= 10) {
 								isGameOver = true;
 								bgmPlayer.stop();
-								if(isSoundon){
-								gameoverPlayer.start();
+								if (isSoundon) {
+									gameoverPlayer.start();
 								}
 							}
 						}
@@ -133,8 +134,8 @@ public class backgroundView extends View {
 										&& bullet[i].getPositionY()
 												- enemyPlanes[j].getPositionY() >= -5) {
 									enemyPlanes[j].enemyDead();
-									if(isSoundon){
-									shootingPlayer.start();
+									if (isSoundon) {
+										shootingPlayer.start();
 									}
 									planeScores++;
 									if (planeScores % 50 == 0
@@ -162,8 +163,8 @@ public class backgroundView extends View {
 								&& enemyPlanes[i].getPositionY() - prefy <= 80) {
 							isGameOver = true;
 							bgmPlayer.stop();
-							if(isSoundon){
-							gameoverPlayer.start();
+							if (isSoundon) {
+								gameoverPlayer.start();
 							}
 						}
 					}
@@ -179,7 +180,8 @@ public class backgroundView extends View {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				handler.sendEmptyMessage(0x123);
+				if (!isPause)
+					handler.sendEmptyMessage(0x123);
 			}
 		}, 0, 50);
 	}
@@ -188,33 +190,35 @@ public class backgroundView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		float x = event.getX();
 		float y = event.getY();
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			/*
-			 * if(x <= prefx){ prefx -= 10; } else { prefx += 10; } if(y <=
-			 * prefy){ prefy -= 10; } else { prefy += 10; } invalidate();
-			 */
-			break;
-		case MotionEvent.ACTION_MOVE:
-			// moveSlope = (y-prefy)/(x-prefx);
-			if (y <= prefy) {
-				// prefx -= speedY*moveSlope;
-				prefy -= moveSpeed;
-			} else {
-				// prefx += speedY*moveSlope;
-				prefy += moveSpeed;
+		if (!isPause) {
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				/*
+				 * if(x <= prefx){ prefx -= 10; } else { prefx += 10; } if(y <=
+				 * prefy){ prefy -= 10; } else { prefy += 10; } invalidate();
+				 */
+				break;
+			case MotionEvent.ACTION_MOVE:
+				// moveSlope = (y-prefy)/(x-prefx);
+				if (y <= prefy) {
+					// prefx -= speedY*moveSlope;
+					prefy -= moveSpeed;
+				} else {
+					// prefx += speedY*moveSlope;
+					prefy += moveSpeed;
+				}
+				if (x <= prefx) {
+					// prefx -= speedY*moveSlope;
+					prefx -= moveSpeed;
+				} else {
+					// prefx += speedY*moveSlope;
+					prefx += moveSpeed;
+				}
+				// if(!isGameOver){
+				invalidate();
+				// }
+				break;
 			}
-			if (x <= prefx) {
-				// prefx -= speedY*moveSlope;
-				prefx -= moveSpeed;
-			} else {
-				// prefx += speedY*moveSlope;
-				prefx += moveSpeed;
-			}
-			// if(!isGameOver){
-			invalidate();
-			// }
-			break;
 		}
 		return true;
 	}
@@ -240,10 +244,12 @@ public class backgroundView extends View {
 		}
 		canvas.drawText("scores:" + planeScores, 500, 80, paint);
 		canvas.drawText("passed enemies:" + passedEnemy, 10, 80, paint);
-		if(isSoundon){
-			canvas.drawText("sound on", 500, 120, paint);
+		if(isPause){
+			canvas.drawText("Pause", 300, 550, paint);
 		}
-		else{
+		if (isSoundon) {
+			canvas.drawText("sound on", 500, 120, paint);
+		} else {
 			canvas.drawText("sound off", 500, 120, paint);
 		}
 		// draw bullets
@@ -258,7 +264,7 @@ public class backgroundView extends View {
 		if (bulletCounter == oneBulletTime) {
 			if (!isGameOver) {
 				bullet[bulletOrder].setExist(true);
-				//shootingPlayer.start();
+				// shootingPlayer.start();
 			}
 		}
 		// bullet[bulletOrder].setExist(true);
@@ -267,7 +273,9 @@ public class backgroundView extends View {
 		if (!isGameOver) {
 			for (int i = 0; i < bulletCount; i++) {
 				if (bullet[i].isExist()) {
+					if (!isPause){
 					bullet[i].shootAndMove();
+					}
 					canvas.drawBitmap(bulletBitmap[i],
 							bullet[i].getPositionX(), bullet[i].getPositionY(),
 							null);
@@ -276,24 +284,29 @@ public class backgroundView extends View {
 		}
 		// draw enemies
 		// if it`s time to release an enemy
-		if (enemyCounter == oneEnemyTime) {
-			enemyCounter = 0;
-			if (enemiesOrder >= enemyCount - 1) {
-				enemiesOrder = 0;
+		if (!isGameOver) {
+			if (enemyCounter == oneEnemyTime) {
+				enemyCounter = 0;
+				if (enemiesOrder >= enemyCount - 1) {
+					enemiesOrder = 0;
+				}
+				enemiesOrder++;
+				enemyPlanes[enemiesOrder].setAlive(true);
 			}
-			enemiesOrder++;
-			enemyPlanes[enemiesOrder].setAlive(true);
-		}
-		enemyCounter++;
-		/*
-		 * if (enemyCounter == 10) { enemyPlanes[enemiesOrder].setAlive(true); }
-		 */
-		for (int i = 0; i < enemyCount; i++) {
-			if (enemyPlanes[i].isAlive()) {
-				enemyPlanes[i].strikeToPlane();
-				canvas.drawBitmap(enemyBitmap[i],
-						enemyPlanes[i].getPositionX(),
-						enemyPlanes[i].getPositionY(), null);
+			enemyCounter++;
+			/*
+			 * if (enemyCounter == 10) {
+			 * enemyPlanes[enemiesOrder].setAlive(true); }
+			 */
+			for (int i = 0; i < enemyCount; i++) {
+				if (enemyPlanes[i].isAlive()) {
+					if (!isPause){
+					enemyPlanes[i].strikeToPlane();
+					}
+					canvas.drawBitmap(enemyBitmap[i],
+							enemyPlanes[i].getPositionX(),
+							enemyPlanes[i].getPositionY(), null);
+				}
 			}
 		}
 	}

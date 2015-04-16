@@ -28,7 +28,8 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		menu.addSubMenu(Menu.NONE, Menu.FIRST+1, 2, "sound off/on");		
+		menu.addSubMenu(Menu.NONE, Menu.FIRST+1, 2, "sound off/on");
+		menu.addSubMenu(Menu.NONE, Menu.FIRST+2, 3, "Pause/Play");
 		return true;
 	}
 	@Override
@@ -46,6 +47,15 @@ public class MainActivity extends Activity {
 			backgroundview.isSoundon = false;
 		}
 			break;
+		case Menu.FIRST+2 :
+			if(backgroundview.isPause){
+				backgroundview.isPause = false;
+				backgroundview.bgmPlayer.start();
+			}
+			else{
+				backgroundview.isPause = true;
+				backgroundview.bgmPlayer.stop();
+			}
 		}
 		return false;
 	}
