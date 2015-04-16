@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		menu.addSubMenu(Menu.NONE, Menu.FIRST, 1, "Restart");
 		menu.addSubMenu(Menu.NONE, Menu.FIRST+1, 2, "sound off/on");
 		menu.addSubMenu(Menu.NONE, Menu.FIRST+2, 3, "Pause/Play");
 		return true;
@@ -36,6 +37,9 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		switch(item.getItemId()){
+		case Menu.FIRST:
+			backgroundview.restart_game();
+			break;
 		case Menu.FIRST+1 :
 			//backgroundview.isSoundon = !backgroundview.isSoundon;
 		if(!backgroundview.isSoundon){
@@ -55,7 +59,7 @@ public class MainActivity extends Activity {
 			else{
 				backgroundview.isPause = true;
 				backgroundview.bgmPlayer.stop();
-			}
+			}		
 		}
 		return false;
 	}

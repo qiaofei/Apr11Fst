@@ -1,5 +1,6 @@
 package com.example.apr11fst;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -60,7 +61,7 @@ public class backgroundView extends View {
 	public MediaPlayer gameoverPlayer;
 	public MediaPlayer shootingPlayer;
 	public MediaPlayer enemyDeadPlayer;
-
+	private Random rand = new Random();
 	public backgroundView(Context context) {
 		super(context);
 		// init sound
@@ -185,6 +186,29 @@ public class backgroundView extends View {
 			}
 		}, 0, 50);
 	}
+	//restart game
+	public void restart_game(){
+		//plane`s position reset		
+		prefx = 330 ;
+		prefy = 800 ;
+		//scores reset
+		planeScores = 0;
+		//bullet reset
+		for (int i = 0 ; i < bulletCount ; i ++){
+			bullet[i].setExist(false);
+		}
+		//enemy reset
+		for(int i = 0 ; i < enemyCount ; i++){
+			enemyPlanes[i].setAlive(false);
+			enemyPlanes[i].setPositionY(0);
+			enemyPlanes[i].setPositionX(rand.nextFloat()*650);
+		}
+		//passed enemies reset
+		passedEnemy = 0;
+		//reset ispause
+		isPause = false;
+		isGameOver = false ;
+	}
 
 	// touch to control plane
 	public boolean onTouchEvent(MotionEvent event) {
@@ -244,7 +268,7 @@ public class backgroundView extends View {
 		}
 		canvas.drawText("scores:" + planeScores, 500, 80, paint);
 		canvas.drawText("passed enemies:" + passedEnemy, 10, 80, paint);
-		if(isPause){
+		if(isPause&&!isGameOver){
 			canvas.drawText("Pause", 300, 550, paint);
 		}
 		if (isSoundon) {
@@ -292,6 +316,7 @@ public class backgroundView extends View {
 				}
 				enemiesOrder++;
 				enemyPlanes[enemiesOrder].setAlive(true);
+				enemyPlanes[enemiesOrder].setPositionX(rand.nextFloat()*650);
 			}
 			enemyCounter++;
 			/*
