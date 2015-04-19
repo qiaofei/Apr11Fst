@@ -98,7 +98,11 @@ public class MainActivity extends Activity {
 		refresh_highscore();
 		super.onStop();
 	}
-
+@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
