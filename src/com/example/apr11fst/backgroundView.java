@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -43,7 +44,7 @@ public class backgroundView extends View {
 	private int oneBulletTime = 5;
 	private int enemyCounter = 0;
 	private int oneEnemyTime = 10;
-	private int planeScores = 0;
+	public int planeScores = 0;
 	public boolean isPause = false;
 	private Bullets bullet[] = new Bullets[bulletCount];
 	private Bitmap bulletBitmap[] = new Bitmap[bulletCount];
@@ -62,8 +63,10 @@ public class backgroundView extends View {
 	public MediaPlayer shootingPlayer;
 	public MediaPlayer enemyDeadPlayer;
 	private Random rand = new Random();
+
 	public backgroundView(Context context) {
 		super(context);
+
 		// init sound
 		bgmPlayer = MediaPlayer.create(context, R.raw.backgroundmusic);
 		if (isSoundon) {
@@ -188,6 +191,9 @@ public class backgroundView extends View {
 	}
 	//restart game
 	public void restart_game(){
+		//speed init
+		oneEnemyTime = 10;
+		oneBulletTime = 5;
 		//plane`s position reset		
 		prefx = 330 ;
 		prefy = 800 ;
