@@ -205,6 +205,7 @@ public class backgroundView extends View {
 		}
 		//enemy reset
 		for(int i = 0 ; i < enemyCount ; i++){
+			enemyPlanes[i].setEnemySpeed(20);
 			enemyPlanes[i].setAlive(false);
 			enemyPlanes[i].setPositionY(0);
 			enemyPlanes[i].setPositionX(rand.nextFloat()*650);
