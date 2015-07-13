@@ -14,6 +14,8 @@ import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -24,17 +26,17 @@ public class backgroundView extends View {
 	// background length
 	final int backLength = 3600;
 	// size of canvas
-	final int WIDTH = 800;
-	final int HEIGHT = 1200;
+	private static int WIDTH = 0;
+	private static int HEIGHT = 0;
 	// control movement
 	// plane`s initial position
-	float prefx = 330;
-	float prefy = 800;
+	private static float prefx = 0;
+	private static float prefy = 0;
 	float bulletX = prefx + 30;
 	float bulletY = prefy - 10;
-	final float moveSpeed = 40;
-	final float planeSpeed = 3;
-	final float bulletSpeed = 20;
+	static float moveSpeed = 0;
+	static float planeSpeed = 0;
+	static float bulletSpeed = 0;
 	// draw bullets
 	private int bulletCount = 40;
 	private int enemyCount = 10;
@@ -52,7 +54,7 @@ public class backgroundView extends View {
 	private EnemyPlane enemyPlanes[] = new EnemyPlane[enemyCount];
 	private Bitmap enemyBitmap[] = new Bitmap[enemyCount];
 	// the beginning place of background
-	int startY = backLength - HEIGHT;
+	static int startY =0;
 	// if Game Over?
 	private boolean isGameOver = false;
 	private int passedEnemy = 0;
@@ -68,6 +70,7 @@ public class backgroundView extends View {
 		super(context);
 
 		// init sound
+		initScreenSize();
 		bgmPlayer = MediaPlayer.create(context, R.raw.backgroundmusic);
 		if (isSoundon) {
 			bgmPlayer.start();
@@ -114,7 +117,7 @@ public class backgroundView extends View {
 					// is enemy is dead
 					for (int i = 0; i < enemyCount; i++) {
 						if (enemyPlanes[i].isAlive()
-								&& enemyPlanes[i].getPositionY() >= 1200) {
+								&& enemyPlanes[i].getPositionY() >= HEIGHT) {
 							enemyPlanes[i].enemyDead();
 							passedEnemy++;
 							if (passedEnemy >= 10) {
@@ -144,7 +147,7 @@ public class backgroundView extends View {
 									planeScores++;
 									if (planeScores % 50 == 0
 											&& planeScores > 0
-											&& oneEnemyTime > 1) {
+											&& oneEnemyTime > 3) {
 										oneEnemyTime--;
 										for (int k = 0; k < enemyCount; k++)
 
@@ -189,14 +192,31 @@ public class backgroundView extends View {
 			}
 		}, 0, 50);
 	}
+	//init screen size
+	private void initScreenSize(){
+		DisplayMetrics metric = new DisplayMetrics();
+		metric = getResources().getDisplayMetrics();
+		//screen width
+		WIDTH = metric.widthPixels;
+		HEIGHT = metric.heightPixels;
+		//the initial position of our plane
+		prefx = WIDTH/2 -40 ;
+		prefy = HEIGHT - 300 ;
+		moveSpeed = HEIGHT / 50;
+		planeSpeed = WIDTH / 100;
+		bulletSpeed = HEIGHT / 100;
+		 startY = backLength - HEIGHT ; 
+		Log.d("Screen", "Width:" + WIDTH);
+		Log.d("Screen" , "Height" + HEIGHT);
+	}
 	//restart game
 	public void restart_game(){
 		//speed init
 		oneEnemyTime = 10;
 		oneBulletTime = 5;
 		//plane`s position reset		
-		prefx = 330 ;
-		prefy = 800 ;
+		prefx =  WIDTH/2 -40 ;
+		prefy = HEIGHT - 300 ;
 		//scores reset
 		planeScores = 0;
 		//bullet reset
@@ -259,7 +279,7 @@ public class backgroundView extends View {
 		// TODO Auto-generated method stub
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
-		paint.setTextSize(40);
+		paint.setTextSize(WIDTH/25);
 		bulletX = prefx + 30;
 		bulletY = prefy - 10;
 		// string scores = (string)
@@ -271,17 +291,17 @@ public class backgroundView extends View {
 		if (!isGameOver) {
 			canvas.drawBitmap(planeBitmap, prefx, prefy, null);
 		} else {
-			canvas.drawText("GAME OVER", 230, 550, paint);
+			canvas.drawText("GAME OVER", WIDTH/2 - WIDTH/80, HEIGHT/2 - HEIGHT/150, paint);
 		}
-		canvas.drawText("scores:" + planeScores, 500, 80, paint);
-		canvas.drawText("passed enemies:" + passedEnemy, 10, 80, paint);
+		canvas.drawText("scores:" + planeScores, WIDTH - WIDTH/5, HEIGHT / 40, paint);
+		canvas.drawText("passed enemies:" + passedEnemy, WIDTH/500, HEIGHT / 40, paint);
 		if(isPause&&!isGameOver){
-			canvas.drawText("Pause", 300, 550, paint);
+			canvas.drawText("Pause", WIDTH/2 - WIDTH/150, HEIGHT/2 - HEIGHT/50, paint);
 		}
 		if (isSoundon) {
-			canvas.drawText("sound on", 500, 120, paint);
+			canvas.drawText("sound on", WIDTH/2 - WIDTH/150, HEIGHT/40, paint);
 		} else {
-			canvas.drawText("sound off", 500, 120, paint);
+			canvas.drawText("sound off", WIDTH/2 - WIDTH/150, HEIGHT/40, paint);
 		}
 		// draw bullets
 		if (bulletOrder >= bulletCount - 1) {
@@ -323,7 +343,8 @@ public class backgroundView extends View {
 				}
 				enemiesOrder++;
 				enemyPlanes[enemiesOrder].setAlive(true);
-				enemyPlanes[enemiesOrder].setPositionX(rand.nextFloat()*650);
+				enemyPlanes[enemiesOrder].setPositionX(rand.nextFloat()*WIDTH - WIDTH/10);
+				enemyPlanes[enemiesOrder].setEnemySpeed(HEIGHT/50);
 			}
 			enemyCounter++;
 			/*

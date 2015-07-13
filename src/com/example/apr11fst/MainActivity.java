@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 
 public class MainActivity extends Activity {
 	private backgroundView backgroundview;
@@ -29,6 +30,7 @@ public class MainActivity extends Activity {
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		backgroundview = new backgroundView(this);
 		setContentView(backgroundview);
 		intent = new Intent();
